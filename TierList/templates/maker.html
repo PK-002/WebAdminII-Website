@@ -1,0 +1,126 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<p>MAKE YOUR TIER LIST</p>
+<div>
+  <div id="container">
+    <div id="row">
+      <div id="label">S</div>
+      <div
+        id="s"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+    <div id="row">
+      <div id="label">A</div>
+      <div
+        id="a"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+    <div id="row">
+      <div id="label">F</div>
+      <div
+        id="f"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <img
+    src="{% static 'TierList/blackcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img1"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/bluecrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img2"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/greencrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img3"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/redcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img4"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+</div>
+
+SUBMIT
+<form action="/maker/" method="post">
+  {% csrf_token %}
+  <input type="text" name="title" placeholder="Tier List Title" required />
+  <input type="hidden" name="ranking_data" id="ranking_data" />
+  <button
+    type="submit"
+    onclick="document.getElementById('ranking_data').value = JSON.stringify(ranking)"
+  >
+    Submit Tier List
+  </button>
+</form>
+<script>
+  var ranking = {
+    S: [],
+    A: [],
+    F: []
+  }
+  var selected = null
+
+  function dragstartHandler(ev) {
+    console.log('Drag Start Event Triggered', ev.srcElement.src)
+    selected = ev.srcElement.src
+
+    // Add the id of the dragged element to the dataTransfer object
+    ev.dataTransfer.setData('text/plain', ev.target.id)
+    ev.dataTransfer.effectAllowed = 'move' // Optional: specify drag effect
+  }
+
+  function dragoverHandler(ev) {
+    // console.log('Drag Over Event Triggered', ev)
+    // Prevent default behavior to allow drop
+    ev.preventDefault()
+    ev.dataTransfer.dropEffect = 'move' // Optional: specify drop effect
+  }
+
+  function dropHandler(ev) {
+    // console.log('Drop Event Triggered', ev)
+    ev.preventDefault()
+    // Get the id of the dragged element
+    const data = ev.dataTransfer.getData('text/plain')
+    const draggedElement = document.getElementById(data)
+
+    // Append the dragged element to the drop target
+    // Check if the target is a valid drop zone
+    if (ev.target.classList.contains('drop-zone')) {
+      console.log(ev.target.id)
+      console.log(ev.dataTransfer)
+      ev.target.appendChild(draggedElement)
+      ranking[ev.target.id.toUpperCase()].push(selected)
+      selected = null
+      console.log(ranking)
+    }
+  }
+</script>
+{% endblock %}

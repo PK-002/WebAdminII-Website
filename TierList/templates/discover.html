@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block content %}
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ranking in rankings %}
+      <tr>
+        <td>
+          <a href="/detail/{{ ranking.id }}/"> {{ ranking.list_name }} </a>
+        </td>
+        <td>{{ ranking.creation_date|date:"SHORT_DATETIME_FORMAT" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
