@@ -33,7 +33,7 @@
   </div>
 </div>
 
-<div>
+<div id="unassigned">
   <img
     src="{% static 'TierList/blackcrewpng.png' %}"
     alt="My image"
@@ -72,19 +72,21 @@ SUBMIT
 <form action="/maker/" method="post">
   {% csrf_token %}
   <input type="text" name="title" placeholder="Tier List Title" required />
+  <select id="ranking_type" name="ranking_type">
+    <option value="template" selected>Template</option>
+    <option value="ordering">Ordering</option>
+  </select>
   <input type="hidden" name="ranking_data" id="ranking_data" />
-  <button
-    type="submit"
-    onclick="document.getElementById('ranking_data').value = JSON.stringify(ranking)"
-  >
-    Submit Tier List
-  </button>
+  <button type="submit" onclick="submit_data()">Submit Tier List</button>
 </form>
 <script>
   var ranking = {
-    S: [],
-    A: [],
-    F: []
+    rows: {
+      S: [],
+      A: [],
+      F: []
+    },
+    unassigned: []
   }
   var selected = null
 
@@ -98,14 +100,12 @@ SUBMIT
   }
 
   function dragoverHandler(ev) {
-    // console.log('Drag Over Event Triggered', ev)
     // Prevent default behavior to allow drop
     ev.preventDefault()
     ev.dataTransfer.dropEffect = 'move' // Optional: specify drop effect
   }
 
   function dropHandler(ev) {
-    // console.log('Drop Event Triggered', ev)
     ev.preventDefault()
     // Get the id of the dragged element
     const data = ev.dataTransfer.getData('text/plain')
@@ -117,10 +117,25 @@ SUBMIT
       console.log(ev.target.id)
       console.log(ev.dataTransfer)
       ev.target.appendChild(draggedElement)
-      ranking[ev.target.id.toUpperCase()].push(selected)
+      ranking.rows[ev.target.id.toUpperCase()].push(selected)
       selected = null
       console.log(ranking)
     }
+  }
+
+  function submit_data() {
+    if (document.getElementById('unassigned').children.length > 0) {
+      for (
+        let i = 0;
+        i < document.getElementById('unassigned').children.length;
+        i++
+      ) {
+        ranking.unassigned.push(
+          document.getElementById('unassigned').children[i].src
+        )
+      }
+    }
+    document.getElementById('ranking_data').value = JSON.stringify(ranking)
   }
 </script>
 {% endblock %}

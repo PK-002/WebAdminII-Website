@@ -5,6 +5,7 @@
       <tr>
         <th>Name</th>
         <th>Created At</th>
+        <th>Type</th>
       </tr>
     </thead>
     <tbody>
@@ -14,6 +15,7 @@
           <a href="/detail/{{ ranking.id }}/"> {{ ranking.list_name }} </a>
         </td>
         <td>{{ ranking.creation_date|date:"SHORT_DATETIME_FORMAT" }}</td>
+        <td>{{ ranking.type }}</td>
       </tr>
       {% endfor %}
     </tbody>
