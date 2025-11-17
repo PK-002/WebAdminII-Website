@@ -18,11 +18,13 @@ def maker(request):
             # Process the valid form data
             title = form.cleaned_data['title']
             ranking_data = form.cleaned_data['ranking_data']
+            ranking_type = request.POST.get('ranking_type')
             # Save the ranking data to the database or perform other actions
             ranking = Ranking.objects.create(
                 list_name=title,
                 creation_date=datetime.now(),
-                tier_config=ranking_data
+                tier_config=ranking_data,
+                type=ranking_type
             )
 
             return redirect('detail', ranking_id=ranking.id)

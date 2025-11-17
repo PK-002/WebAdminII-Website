@@ -10,6 +10,7 @@ class Ranking(models.Model):
     creation_date = models.DateTimeField("date created")
     image_url = models.URLField(blank=True,null=True)
     tier_config = models.JSONField(null=True)
+    type = models.CharField(max_length=200, default="template")
 
 class Item(models.Model):
     Ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
