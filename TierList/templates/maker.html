@@ -4,14 +4,38 @@
 <div id="row-container"></div>
 
 <div id="unassigned">
-  <img src="{% static 'TierList/blackcrewpng.png' %}" alt="My image" width="100px" id="img1" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/bluecrewpng.png' %}" alt="My image" width="100px" id="img2" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/greencrewpng.png' %}" alt="My image" width="100px" id="img3" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/redcrewpng.png' %}" alt="My image" width="100px" id="img4" draggable="true"
-    ondragstart="dragstartHandler(event)" />
+  <img
+    src="{% static 'TierList/blackcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img1"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/bluecrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img2"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/greencrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img3"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/redcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img4"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
 </div>
 
 <div id="submit-form">
@@ -41,32 +65,31 @@
     unassigned: []
   }
 
-  const container = document.getElementById("row-container");
+  const container = document.getElementById('row-container')
   //create rows based on ranking.rows keys
   for (const key in ranking.rows) {
-
     //rows themselves
-    const tier_row = document.createElement("div");
-    tier_row.id = `row${key}`;
-    tier_row.className = "row";
+    const tier_row = document.createElement('div')
+    tier_row.id = `row${key}`
+    tier_row.className = 'row'
 
     //left side labels
-    const label = document.createElement("div");
-    label.id = `label${key}`;
-    label.className = "tier-label";
-    label.textContent = key;
+    const label = document.createElement('div')
+    label.id = `label${key}`
+    label.className = 'tier-label'
+    label.textContent = key
 
     //dropzones
-    const dropzone = document.createElement("div");
-    dropzone.id = `dropzone${key}`;
-    dropzone.addEventListener("drop", dropHandler);
-    dropzone.addEventListener("dragover", dragoverHandler);
-    dropzone.className = "drop-zone";
-    
-    tier_row.appendChild(label);
-    tier_row.appendChild(dropzone);
+    const dropzone = document.createElement('div')
+    dropzone.id = `dropzone${key}`
+    dropzone.addEventListener('drop', dropHandler)
+    dropzone.addEventListener('dragover', dragoverHandler)
+    dropzone.className = 'drop-zone'
 
-    container.appendChild(tier_row);
+    tier_row.appendChild(label)
+    tier_row.appendChild(dropzone)
+
+    container.appendChild(tier_row)
   }
 
   var selected = null
@@ -97,8 +120,11 @@
     if (ev.target.classList.contains('drop-zone')) {
       console.log(ev.target.id)
       console.log(ev.dataTransfer)
+
       ev.target.appendChild(draggedElement)
-      ranking.rows[ev.target.id.toUpperCase()].push(selected)
+      id = ev.target.id.replace('dropzone', '')
+
+      ranking.rows[id.toUpperCase()].push(selected)
       selected = null
       console.log(ranking)
     }
