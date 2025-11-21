@@ -1,93 +1,74 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
-<p>MAKE YOUR TIER LIST</p>
-<div>
-  <div id="container">
-    <div id="row">
-      <div id="label">S</div>
-      <div
-        id="s"
-        ondrop="dropHandler(event)"
-        ondragover="dragoverHandler(event)"
-        class="drop-zone"
-      ></div>
-    </div>
-    <div id="row">
-      <div id="label">A</div>
-      <div
-        id="a"
-        ondrop="dropHandler(event)"
-        ondragover="dragoverHandler(event)"
-        class="drop-zone"
-      ></div>
-    </div>
-    <div id="row">
-      <div id="label">F</div>
-      <div
-        id="f"
-        ondrop="dropHandler(event)"
-        ondragover="dragoverHandler(event)"
-        class="drop-zone"
-      ></div>
-    </div>
-  </div>
-</div>
+<p id="pagetitle">MAKE YOUR TIER LIST</p>
+<div id="row-container"></div>
 
 <div id="unassigned">
-  <img
-    src="{% static 'TierList/blackcrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img1"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
-  <img
-    src="{% static 'TierList/bluecrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img2"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
-  <img
-    src="{% static 'TierList/greencrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img3"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
-  <img
-    src="{% static 'TierList/redcrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img4"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
+  <img src="{% static 'TierList/blackcrewpng.png' %}" alt="My image" width="100px" id="img1" draggable="true"
+    ondragstart="dragstartHandler(event)" />
+  <img src="{% static 'TierList/bluecrewpng.png' %}" alt="My image" width="100px" id="img2" draggable="true"
+    ondragstart="dragstartHandler(event)" />
+  <img src="{% static 'TierList/greencrewpng.png' %}" alt="My image" width="100px" id="img3" draggable="true"
+    ondragstart="dragstartHandler(event)" />
+  <img src="{% static 'TierList/redcrewpng.png' %}" alt="My image" width="100px" id="img4" draggable="true"
+    ondragstart="dragstartHandler(event)" />
 </div>
 
-SUBMIT
-<form action="/maker/" method="post">
-  {% csrf_token %}
-  <input type="text" name="title" placeholder="Tier List Title" required />
-  <select id="ranking_type" name="ranking_type">
-    <option value="template" selected>Template</option>
-    <option value="ordering">Ordering</option>
-  </select>
-  <input type="hidden" name="ranking_data" id="ranking_data" />
-  <button type="submit" onclick="submit_data()">Submit Tier List</button>
-</form>
+<div id="submit-form">
+  <p>SUBMIT</p>
+  <form action="/maker/" method="post">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Tier List Title" required />
+    <select id="ranking_type" name="ranking_type">
+      <option value="template" selected>Template</option>
+      <option value="ordering">Ordering</option>
+    </select>
+    <input type="hidden" name="ranking_data" id="ranking_data" />
+    <button type="submit" onclick="submit_data()">Submit Tier List</button>
+  </form>
+</div>
+
 <script>
   var ranking = {
     rows: {
       S: [],
       A: [],
+      B: [],
+      C: [],
+      D: [],
       F: []
     },
     unassigned: []
   }
+
+  const container = document.getElementById("row-container");
+  //create rows based on ranking.rows keys
+  for (const key in ranking.rows) {
+
+    //rows themselves
+    const tier_row = document.createElement("div");
+    tier_row.id = `row${key}`;
+    tier_row.className = "row";
+
+    //left side labels
+    const label = document.createElement("div");
+    label.id = `label${key}`;
+    label.className = "tier-label";
+    label.textContent = key;
+
+    //dropzones
+    const dropzone = document.createElement("div");
+    dropzone.id = `dropzone${key}`;
+    dropzone.addEventListener("drop", dropHandler);
+    dropzone.addEventListener("dragover", dragoverHandler);
+    dropzone.className = "drop-zone";
+    
+    tier_row.appendChild(label);
+    tier_row.appendChild(dropzone);
+
+    container.appendChild(tier_row);
+  }
+
   var selected = null
 
   function dragstartHandler(ev) {
