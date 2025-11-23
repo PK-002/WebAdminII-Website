@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div>
+  <h1>Config</h1>
+  Config your new ranking template here!
+
+  <form>
+    <label for="list_name">List Name:</label>
+    <input type="text" id="list_name" name="list_name" /><br /><br />
+
+    <label for="type">Type:</label>
+    <input type="text" id="type" name="type" /><br /><br />
+
+    <input type="submit" value="Submit" />
+  </form>
+</div>
+
+{% endblock %}
