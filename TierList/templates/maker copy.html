@@ -1,17 +1,5 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
-<div id="myPopup" class="popup-overlay">
-  <div class="popup-content">
-    <h2>Download</h2>
-    <p>This will show you a preview of your ranking before downloading it.</p>
-
-    <button onclick="closePopup()">Close</button>
-
-    <button id="downloadButton">Download Ranking as PNG</button>
-    <canvas id="myCanvas" width="500" height="500"></canvas>
-  </div>
-</div>
-
 <p>MAKE YOUR TIER LIST</p>
 <div>
   <div id="container">
@@ -83,10 +71,18 @@
 <input type="file" id="imageUpload" accept="image/*" multiple />
 <div id="imagePreview"></div>
 
-<div>
-  <button onclick="openPopup()">Download</button>
-</div>
-
+SUBMIT
+<form action="/maker/" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="text" name="title" placeholder="Tier List Title" required />
+  <select id="ranking_type" name="ranking_type">
+    <option value="template" selected>Template</option>
+    <option value="ordering">Ordering</option>
+  </select>
+  <input type="hidden" name="ranking_data" id="ranking_data" />
+  <input type="hidden" name="image_data" id="image_data" />
+  <button type="submit" onclick="submit_data()">Submit Tier List</button>
+</form>
 <script>
   var ranking = {
     rows: {
@@ -96,46 +92,17 @@
     },
     unassigned: []
   }
+  // var image_data = {
+  //   images: [ 1: image, 2: image, 3: image, 4: image]
+  // }
   var selected = null
 
-  function openPopup() {
-    document.getElementById('myPopup').style.display =
-      'flex' /* Use flex to center content */
-
-    const canvas = document.getElementById('myCanvas')
-    const ctx = canvas.getContext('2d')
-
-    // Next step is to make this canvas print out the current ranking
-    ctx.fillStyle = 'blue'
-    ctx.fillRect(50, 50, 100, 100)
-
-    document
-      .getElementById('downloadButton')
-      .addEventListener('click', function () {
-        const dataURL = canvas.toDataURL('image/png')
-        const downloadLink = document.createElement('a')
-        downloadLink.href = dataURL
-        downloadLink.download = 'my-drawing.png'
-        downloadLink.click()
-        downloadLink.remove()
-      })
-  }
-
-  function closePopup() {
-    document.getElementById('myPopup').style.display = 'none'
-  }
-
-  // Optional: Close the popup when clicking outside the content
-  window.onclick = function (event) {
-    if (event.target == document.getElementById('myPopup')) {
-      document.getElementById('myPopup').style.display = 'none'
-    }
-  }
-
   function dragstartHandler(ev) {
+    // console.log('Drag Start Event Triggered', ev.srcElement.src)
     selected = ev.srcElement.src
 
     // Add the id of the dragged element to the dataTransfer object
+    console.log('ev.target', ev.target)
     ev.dataTransfer.setData('text/plain', ev.target.id)
     ev.dataTransfer.effectAllowed = 'move' // Optional: specify drag effect
   }
@@ -160,7 +127,30 @@
       ev.target.appendChild(draggedElement)
       ranking.rows[ev.target.id.toUpperCase()].push(selected)
       selected = null
+      // console.log(ranking)
     }
+  }
+
+  // OK I NEED TO PUSH THE IMAGES IN AN ARRAY THAT IS IN THE HIDDEN INPUT FIELD AND THEN THE VIEWS.PY Will make the actual record
+  // Store uploaded images as base64 strings
+  let uploadedImages = []
+
+  function submit_data() {
+    if (document.getElementById('unassigned').children.length > 0) {
+      for (
+        let i = 0;
+        i < document.getElementById('unassigned').children.length;
+        i++
+      ) {
+        ranking.unassigned.push(
+          document.getElementById('unassigned').children[i].src
+        )
+      }
+    }
+    document.getElementById('ranking_data').value = JSON.stringify(ranking)
+    // Save uploadedImages array as JSON string in hidden input
+
+    document.getElementById('image_data').value = uploadedImages
   }
 
   document
@@ -169,6 +159,7 @@
       const files = event.target.files
       const imagePreviewDiv = document.getElementById('imagePreview')
       imagePreviewDiv.innerHTML = ''
+      uploadedImages = []
 
       if (files.length > 0) {
         Array.from(files).forEach((file, idx) => {

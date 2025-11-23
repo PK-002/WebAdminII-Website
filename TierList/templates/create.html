@@ -1,0 +1,55 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<!-- STILL A WIP -->
+<div>
+  <h1>{{ ranking.list_name }}</h1>
+  <h3>Created at: {{ ranking.creation_date }}</h3>
+
+  <div id="container">
+    {% for tier, items in ranking.tier_config.rows.items %}
+    <div id="row">
+      <div id="label">{{ tier }}</div>
+      <div>
+        {% for item in items %}
+
+        <img src="{{ item }}" width="100" height="100" />
+
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    <div>
+      {% for item in ranking.tier_config.unassigned %}
+
+      <img src="{{ item }}" width="100" height="100" />
+
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- {% for image in images %}
+  <img src="{{ image.image.url }}" width="100" height="100" />
+  {% endfor %} -->
+
+  SUBMIT
+  <form
+    action="/create/{{ ranking.id }}/"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Tier List Title" required />
+    <select id="ranking_type" name="ranking_type">
+      <option value="template" selected>Template</option>
+      <option value="ordering">Ordering</option>
+    </select>
+    <input type="hidden" name="ranking_data" id="ranking_data" />
+    <input type="hidden" name="image_data" id="image_data" />
+    <button type="submit" onclick="submit_data()">Submit Tier List</button>
+  </form>
+</div>
+
+<script>
+  const tierConfig = {{ ranking.tier_config|safe }};
+  console.log(tierConfig);
+</script>
+{% endblock %}
