@@ -78,8 +78,8 @@ tbody tr:nth-child(odd) {
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; /* Adjust as needed */
-  max-width: 500px; /* Max width for larger screens */
+  width: 90%; /* Adjust as needed */
+  max-width: 700px; /* Max width for larger screens */
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   animation-name: animatetop;
   animation-duration: 0.4s;
@@ -103,6 +103,7 @@ tbody tr:nth-child(odd) {
   justify-content: center;
   margin-top: 20px;
   width: 60%;
+  height: 100px;
   border: 2px solid black;
 }
 

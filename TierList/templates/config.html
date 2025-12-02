@@ -8,11 +8,9 @@
     <label for="list_name">List Name:</label>
     <input type="text" id="list_name" name="list_name" /><br /><br />
 
-    <label for="type">Type:</label>
-    <input type="text" id="type" name="type" /><br /><br />
-
+    <input type="file" id="imageUpload" accept="image/*" multiple /><br /><br />
+    {% include 'unassigned.html' %}
     <input type="submit" value="Submit" />
   </form>
 </div>
-
 {% endblock %}
