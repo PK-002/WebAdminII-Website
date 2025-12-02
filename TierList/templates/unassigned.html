@@ -1,0 +1,73 @@
+{% load static %}
+<div id="unassigned" class="row">
+  <!-- <img
+    src="{% static 'TierList/blackcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img1"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/bluecrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img2"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/greencrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img3"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/redcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img4"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  /> -->
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document
+      .getElementById('imageUpload')
+      .addEventListener('change', function (event) {
+        // Need to make sure there is an imageUpload element in the HTML
+        const files = event.target.files
+        const imagePreviewDiv = document.getElementById('unassigned')
+
+        if (files.length > 0) {
+          Array.from(files).forEach((file, idx) => {
+            const reader = new FileReader()
+            reader.onload = function (e) {
+              // Save base64 string to array
+              console.log('added to uploadimage', e.target.result)
+
+              // Preview image
+              const img = document.createElement('img')
+              img.src = e.target.result
+              img.style.width = '100px'
+              img.style.height = 'auto'
+              if (typeof dragstartHandler === 'function') {
+                img.ondragstart = dragstartHandler
+                img.draggable = true
+                img.id = 'img' + (1000 + image_count)
+                image_count++
+              }
+              imagePreviewDiv.appendChild(img)
+            }
+            reader.readAsDataURL(file)
+          })
+        } else {
+          imagePreviewDiv.innerHTML = ''
+        }
+      })
+  })
+</script>
