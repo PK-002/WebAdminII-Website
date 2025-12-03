@@ -1,0 +1,191 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<p>MAKE YOUR TIER LIST</p>
+<div>
+  <div id="container">
+    <div id="row">
+      <div id="label">S</div>
+      <div
+        id="s"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+    <div id="row">
+      <div id="label">A</div>
+      <div
+        id="a"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+    <div id="row">
+      <div id="label">F</div>
+      <div
+        id="f"
+        ondrop="dropHandler(event)"
+        ondragover="dragoverHandler(event)"
+        class="drop-zone"
+      ></div>
+    </div>
+  </div>
+</div>
+
+<div id="unassigned">
+  <img
+    src="{% static 'TierList/blackcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img1"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/bluecrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img2"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/greencrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img3"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+  <img
+    src="{% static 'TierList/redcrewpng.png' %}"
+    alt="My image"
+    width="100px"
+    id="img4"
+    draggable="true"
+    ondragstart="dragstartHandler(event)"
+  />
+</div>
+
+<input type="file" id="imageUpload" accept="image/*" multiple />
+<div id="imagePreview"></div>
+
+SUBMIT
+<form action="/maker/" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="text" name="title" placeholder="Tier List Title" required />
+  <select id="ranking_type" name="ranking_type">
+    <option value="template" selected>Template</option>
+    <option value="ordering">Ordering</option>
+  </select>
+  <input type="hidden" name="ranking_data" id="ranking_data" />
+  <input type="hidden" name="image_data" id="image_data" />
+  <button type="submit" onclick="submit_data()">Submit Tier List</button>
+</form>
+<script>
+  var ranking = {
+    rows: {
+      S: [],
+      A: [],
+      F: []
+    },
+    unassigned: []
+  }
+  // var image_data = {
+  //   images: [ 1: image, 2: image, 3: image, 4: image]
+  // }
+  var selected = null
+
+  function dragstartHandler(ev) {
+    // console.log('Drag Start Event Triggered', ev.srcElement.src)
+    selected = ev.srcElement.src
+
+    // Add the id of the dragged element to the dataTransfer object
+    console.log('ev.target', ev.target)
+    ev.dataTransfer.setData('text/plain', ev.target.id)
+    ev.dataTransfer.effectAllowed = 'move' // Optional: specify drag effect
+  }
+
+  function dragoverHandler(ev) {
+    // Prevent default behavior to allow drop
+    ev.preventDefault()
+    ev.dataTransfer.dropEffect = 'move' // Optional: specify drop effect
+  }
+
+  function dropHandler(ev) {
+    ev.preventDefault()
+    // Get the id of the dragged element
+    const data = ev.dataTransfer.getData('text/plain')
+    const draggedElement = document.getElementById(data)
+
+    // Append the dragged element to the drop target
+    // Check if the target is a valid drop zone
+    if (ev.target.classList.contains('drop-zone')) {
+      console.log(ev.target.id)
+      console.log(ev.dataTransfer)
+      ev.target.appendChild(draggedElement)
+      ranking.rows[ev.target.id.toUpperCase()].push(selected)
+      selected = null
+      // console.log(ranking)
+    }
+  }
+
+  // OK I NEED TO PUSH THE IMAGES IN AN ARRAY THAT IS IN THE HIDDEN INPUT FIELD AND THEN THE VIEWS.PY Will make the actual record
+  // Store uploaded images as base64 strings
+  let uploadedImages = []
+
+  function submit_data() {
+    if (document.getElementById('unassigned').children.length > 0) {
+      for (
+        let i = 0;
+        i < document.getElementById('unassigned').children.length;
+        i++
+      ) {
+        ranking.unassigned.push(
+          document.getElementById('unassigned').children[i].src
+        )
+      }
+    }
+    document.getElementById('ranking_data').value = JSON.stringify(ranking)
+    // Save uploadedImages array as JSON string in hidden input
+
+    document.getElementById('image_data').value = uploadedImages
+  }
+
+  document
+    .getElementById('imageUpload')
+    .addEventListener('change', function (event) {
+      const files = event.target.files
+      const imagePreviewDiv = document.getElementById('imagePreview')
+      imagePreviewDiv.innerHTML = ''
+      uploadedImages = []
+
+      if (files.length > 0) {
+        Array.from(files).forEach((file, idx) => {
+          const reader = new FileReader()
+          reader.onload = function (e) {
+            // Save base64 string to array
+            uploadedImages.push(e.target.result)
+            console.log('added to uploadimage', e.target.result)
+            // Optionally store in localStorage for persistence
+            // localStorage.setItem('uploadedImage_' + idx, e.target.result)
+
+            // Preview image
+            const img = document.createElement('img')
+            img.src = e.target.result
+            img.style.maxWidth = '100%'
+            img.style.height = 'auto'
+            img.ondragstart = dragstartHandler
+            img.draggable = true
+            img.id = 'img' + (1000 + idx)
+            imagePreviewDiv.appendChild(img)
+          }
+          reader.readAsDataURL(file)
+        })
+      } else {
+        imagePreviewDiv.innerHTML = ''
+      }
+    })
+</script>
+{% endblock %}

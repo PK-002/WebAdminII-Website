@@ -1,34 +1,32 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
+<div id="myPopup" class="popup-overlay">
+  <div class="popup-content">
+    <h2>Download</h2>
+    <p>This will show you a preview of your ranking before downloading it.</p>
+
+    <button onclick="closePopup()">Close</button>
+
+    <button id="downloadButton">Download Ranking as PNG</button>
+    <div id="render"></div>
+  </div>
+</div>
+
 <p id="pagetitle">MAKE YOUR TIER LIST</p>
-<div id="row-container"></div>
-
-<div id="unassigned">
-  <img src="{% static 'TierList/blackcrewpng.png' %}" alt="My image" width="100px" id="img1" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/bluecrewpng.png' %}" alt="My image" width="100px" id="img2" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/greencrewpng.png' %}" alt="My image" width="100px" id="img3" draggable="true"
-    ondragstart="dragstartHandler(event)" />
-  <img src="{% static 'TierList/redcrewpng.png' %}" alt="My image" width="100px" id="img4" draggable="true"
-    ondragstart="dragstartHandler(event)" />
+<div id="ranking">
+  <div id="row-container"></div>
+  {% include 'unassigned.html' %}
 </div>
 
-<div id="submit-form">
-  <p>SUBMIT</p>
-  <form action="/maker/" method="post">
-    {% csrf_token %}
-    <input type="text" name="title" placeholder="Tier List Title" required />
-    <select id="ranking_type" name="ranking_type">
-      <option value="template" selected>Template</option>
-      <option value="ordering">Ordering</option>
-    </select>
-    <input type="hidden" name="ranking_data" id="ranking_data" />
-    <button type="submit" onclick="submit_data()">Submit Tier List</button>
-  </form>
+<input type="file" id="imageUpload" accept="image/*" multiple />
+
+<div>
+  <button onclick="openPopup()">Download</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
+  var image_count = 0
   var ranking = {
     rows: {
       S: [],
@@ -41,20 +39,19 @@
     unassigned: []
   }
 
-  const container = document.getElementById("row-container");
+  const container = document.getElementById('row-container')
   //create rows based on ranking.rows keys
   for (const key in ranking.rows) {
-
     //rows themselves
-    const tier_row = document.createElement("div");
-    tier_row.id = `row${key}`;
-    tier_row.className = "row";
+    const tier_row = document.createElement('div')
+    tier_row.id = `row${key}`
+    tier_row.className = 'row'
 
     //left side labels
-    const label = document.createElement("div");
-    label.id = `label${key}`;
-    label.className = "tier-label";
-    label.textContent = key;
+    const label = document.createElement('div')
+    label.id = `label${key}`
+    label.className = 'tier-label'
+    label.textContent = key
 
     //dropzones
     const dropzone = document.createElement("div");
@@ -79,8 +76,45 @@
 
   var selected = null
 
+  function openPopup() {
+    document.getElementById('myPopup').style.display =
+      'flex' /* Use flex to center content */
+
+    // May change the function back to this VVV but for now we just need row-container
+    // html2canvas(document.querySelector('#render')).then((canvas) => {
+    html2canvas(document.querySelector('#row-container')).then((canvas) => {
+      const renderDiv = document.querySelector('#render')
+      renderDiv.innerHTML = '' // Clear previous content
+      renderDiv.appendChild(canvas)
+
+      canvas.style.maxWidth = '100%'
+      canvas.style.height = 'auto'
+
+      document
+        .getElementById('downloadButton')
+        .addEventListener('click', function () {
+          const dataURL = canvas.toDataURL('image/png')
+          const downloadLink = document.createElement('a')
+          downloadLink.href = dataURL
+          downloadLink.download = 'my-ranking.png'
+          downloadLink.click()
+          downloadLink.remove()
+        })
+    })
+  }
+
+  function closePopup() {
+    document.getElementById('myPopup').style.display = 'none'
+  }
+
+  // Optional: Close the popup when clicking outside the content
+  window.onclick = function (event) {
+    if (event.target == document.getElementById('myPopup')) {
+      document.getElementById('myPopup').style.display = 'none'
+    }
+  }
+
   function dragstartHandler(ev) {
-    console.log('Drag Start Event Triggered', ev.srcElement.src)
     selected = ev.srcElement.src
 
     // Add the id of the dragged element to the dataTransfer object
@@ -105,12 +139,14 @@
     if (ev.target.classList.contains('drop-zone')) {
       console.log(ev.target.id)
       console.log(ev.dataTransfer)
+
       ev.target.appendChild(draggedElement)
-      ranking.rows[ev.target.id.toUpperCase()].push(selected)
+      id = ev.target.id.replace('dropzone', '')
+      draggedElement.style.width = '100px'
+      draggedElement.style.height = '100px'
+      
+      ranking.rows[id.toUpperCase()].push(selected)
       selected = null
-      console.log(ranking)
-    }
-  }
 
   function settingsPopUp(ev) {
     println('Settings Popup Triggered')
@@ -149,7 +185,6 @@
         )
       }
     }
-    document.getElementById('ranking_data').value = JSON.stringify(ranking)
   }
 </script>
 {% endblock %}

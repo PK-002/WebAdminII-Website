@@ -12,6 +12,10 @@ class Ranking(models.Model):
     tier_config = models.JSONField(null=True)
     type = models.CharField(max_length=200, default="template")
 
+class Image(models.Model):
+    ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to='images/')
+    
 class Item(models.Model):
     Ranking = models.ForeignKey(Ranking, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=200)

@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %} -->
     <script
       src="https://kit.fontawesome.com/fa6f006057.js"
       crossorigin="anonymous"
@@ -13,16 +14,27 @@
   </head>
   <body>
     <header class="site-header">
-      <h2>
-        <b><i class="fa-solid fa-scale-unbalanced fa-2x"></i>RANK THAT</b>
-      </h2>
+      <div
+        class="container"
+        style="display: flex; justify-content: space-between"
+      >
+        <h2>
+          <b><i class="fa-solid fa-scale-unbalanced fa-2x"></i>RANK THAT</b>
+        </h2>
+        {% if user.is_authenticated %}
+        <h2>
+          <a href="/dashboard/">{{ user.username }}</a>
+          <i class="fa-solid fa-circle-user fa-2x"></i>
+        </h2>
+        {% endif %}
+      </div>
 
       <a href="/">Home</a>
       |
       <a href="/discover">Discover</a>
       |
-      <a href="/maker">Maker</a>
+      <a href="/new">Create</a>
     </header>
-    <main>{% block content %} hi {% endblock %}</main>
+    <main>{% block content %} {% endblock %}</main>
   </body>
 </html>

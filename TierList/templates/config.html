@@ -1,0 +1,22 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div>
+  <h1>Config</h1>
+  Config your new ranking template here!
+
+  <form id="post_form" method="post" action="" enctype="multipart/form-data">
+    {% csrf_token %} {{ form.title.label_tag }} {{ form.title }}<br /><br />
+    <label for="images">Images:</label>
+    <input
+      type="file"
+      name="images"
+      id="images"
+      multiple
+      accept="image/*"
+    /><br /><br />
+    <input type="submit" value="Submit" />
+  </form>
+
+<!-- Need to add unassigned to this page -->
+</div>
+{% endblock %}

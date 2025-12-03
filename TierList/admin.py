@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import Ranking, Item
+from .models import Ranking, Image
 
-class ItemAdmin(admin.ModelAdmin):
-    list_display = ["item_name", "tier_level", "position", "Ranking"]
-    list_filter = ["tier_level", "Ranking"]
-    search_fields = ["item_name", "tier_level"]
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ["ranking", "image"]
+    list_filter = ["ranking"]
+    search_fields = ["ranking__list_name"]
 
 
 class TierAdmin(admin.ModelAdmin):
@@ -19,4 +19,5 @@ class TierAdmin(admin.ModelAdmin):
     search_fields = ["list_name"]
 
 admin.site.register(Ranking, TierAdmin)
+admin.site.register(Image, ImageAdmin)
 
