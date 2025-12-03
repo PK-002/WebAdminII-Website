@@ -1,0 +1,30 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div>
+  <h1>ACCOUNT DASHBOARD</h1>
+  <p>Welcome, {{ user.username }}!</p>
+
+  <h2>Your Rankings</h2>
+  <ul>
+    {% for ranking in rankings %}
+    <li>
+      <a href="{% url 'ranking_detail' ranking.id %}">{{ ranking.title }}</a>
+    </li>
+    {% empty %}
+    <li>You have no rankings yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h2>Actions</h2>
+  {% if user.is_authenticated %}
+  <form method="POST" action="{% url 'logout' %}" style="display: inline">
+    {% csrf_token %}
+    <!-- Essential for security -->
+    <button type="submit">Log Out</button>
+  </form>
+  {% else %}
+  <a href="{% url 'login' %}">Log In</a>|
+  <a href="{% url 'register' %}">Register</a>
+  {% endif %}
+</div>
+{% endblock %}
