@@ -54,16 +54,24 @@
     label.textContent = key
 
     //dropzones
-    const dropzone = document.createElement('div')
-    dropzone.id = `dropzone${key}`
-    dropzone.addEventListener('drop', dropHandler)
-    dropzone.addEventListener('dragover', dragoverHandler)
-    dropzone.className = 'drop-zone'
+    const dropzone = document.createElement("div");
+    dropzone.id = `dropzone${key}`;
+    dropzone.addEventListener("drop", dropHandler);
+    dropzone.addEventListener("dragover", dragoverHandler);
+    dropzone.className = "drop-zone";
 
-    tier_row.appendChild(label)
-    tier_row.appendChild(dropzone)
+    //settings
+    const settings = document.createElement("div");
+    settings.id = `settings${key}`;
+    settings.className = "tier-settings";
+    settings.addEventListener("click", settingsPopUp)
 
-    container.appendChild(tier_row)
+
+    tier_row.appendChild(label);
+    tier_row.appendChild(dropzone);
+    tier_row.appendChild(settings);
+
+    container.appendChild(tier_row);
   }
 
   var selected = null
@@ -136,9 +144,46 @@
       id = ev.target.id.replace('dropzone', '')
       draggedElement.style.width = '100px'
       draggedElement.style.height = '100px'
-
+      
       ranking.rows[id.toUpperCase()].push(selected)
       selected = null
+
+  function settingsPopUp(ev) {
+    println('Settings Popup Triggered')
+
+    document.createElement('div');
+
+    const popup = document.getElementById(ev.parentElement.id);
+    popup.id = 'popup';
+
+    if (popup.classList.contains('hidden')) {
+      // Show popup
+      popup.classList.remove('hidden');
+      popup.classList.add('visible');
+
+      // Position popup under this element
+      const rect = this.getBoundingClientRect();
+      popup.style.top = rect.bottom + window.scrollY + 'px';
+      popup.style.left = rect.left + window.scrollX + 'px';
+
+    } else {
+      // Hide popup
+      popup.classList.remove('visible');
+      popup.classList.add('hidden');
+    }
+  }
+
+  function submit_data() {
+    if (document.getElementById('unassigned').children.length > 0) {
+      for (
+        let i = 0;
+        i < document.getElementById('unassigned').children.length;
+        i++
+      ) {
+        ranking.unassigned.push(
+          document.getElementById('unassigned').children[i].src
+        )
+      }
     }
   }
 </script>

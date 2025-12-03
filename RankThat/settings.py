@@ -121,9 +121,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+# During development Django finds static files in each app's `static/`
+# directories automatically. To avoid ambiguity between an existing
+# `static/` project folder and app static files, leave `STATICFILES_DIRS`
+# empty and use each app's `static/` directory as the source of truth.
+STATICFILES_DIRS = []
+
+# `STATIC_ROOT` is the target for `collectstatic` in production.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
