@@ -1,0 +1,11 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div>
+  {% if user.is_authenticated %}
+  <form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Log Out</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

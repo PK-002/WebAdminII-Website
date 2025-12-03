@@ -6,6 +6,7 @@ venv/
 *.pyc
 __pycache__
 /staticfiles/
+/node_modules/
 
 db.sqlite3
 media

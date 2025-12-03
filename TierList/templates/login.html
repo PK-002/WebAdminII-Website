@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+
+<div>
+  <h2>Login</h2>
+
+  {% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+
+  <form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    <!-- Required for security -->
+
+    {{ form.as_p }}
+    <!-- Renders form fields inside <p> tags -->
+
+    <button type="submit">Log In</button>
+
+    <!-- Add a hidden field to redirect the user to a specific page after login -->
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+
+  <p>Need an account? <a href="{% url 'register' %}">Register here</a></p>
+  <p><a href="{% url 'admin:index' %}">Admin Login</a></p>
+</div>
+{% endblock %}

@@ -1,12 +1,18 @@
 from django import forms
 
-from TierList.models import Image
+from TierList.models import Image, Ranking
+
+from django.contrib.auth.forms import UserCreationForm
 
 class TierListForm(forms.Form):
     title = forms.CharField(max_length=100)
-    ranking_data = forms.JSONField()
 
-class ImageUploadForm(forms.Form):
+    class Meta:
+        model = Ranking
+        fields = ('title',)
+
+class ImageUploadForm(forms.ModelForm):
+    image = forms.ImageField(label='Image')
     class Meta:
         model = Image
-        fields = ['ranking', 'image']
+        fields = ('image', )
