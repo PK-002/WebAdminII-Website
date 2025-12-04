@@ -1,0 +1,153 @@
+{% load static %}
+<div id="row-container"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ranking = {
+            rows: {
+                S: [],
+                A: [],
+                B: [],
+                C: [],
+                D: [],
+                F: []
+            },
+            unassigned: []
+        }
+
+        const container = document.getElementById("row-container");
+        //create rows based on ranking.rows keys
+        for (const key in ranking.rows) {
+
+            //rows themselves
+            const tier_row = document.createElement("div");
+            tier_row.id = `row${key}`;
+            tier_row.className = "row";
+
+            //left side labels
+            const label = document.createElement("div");
+            label.id = `label${key}`;
+            label.className = "tier-label";
+            label.textContent = key;
+
+            //dropzones
+            const dropzone = document.createElement("div");
+            dropzone.id = `dropzone${key}`;
+            dropzone.addEventListener("drop", dropHandler);
+            dropzone.addEventListener("dragover", dragoverHandler);
+            dropzone.className = "drop-zone";
+
+            //settings
+            const settings = document.createElement("div");
+            settings.id = `settings${key}`;
+            settings.className = "tier-settings";
+
+            //append all to the rows
+            tier_row.appendChild(label);
+            tier_row.appendChild(dropzone);
+            tier_row.appendChild(settings);
+            container.appendChild(tier_row);
+        }
+
+        settings_tabs = document.getElementsByClassName("tier-settings");
+
+        for (const tab of settings_tabs) {
+            const tier = tab.id.replace("settings", "");  // S, A, B, ...
+
+            // gear button
+            const palette = document.createElement("button");
+            palette.id = `palette-${tier}`;
+            palette.className = "palette";
+            palette.innerHTML = '<i class="fa-slab fa-regular fa-palette fa-xl"></i>';
+            palette.addEventListener("click", changeColor);
+
+            // trash button
+            const trash = document.createElement("button");
+            trash.id = `trash-${tier}`;
+            trash.className = "trash";
+            trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>';
+            trash.addEventListener("click", deleteTierFunction);
+
+            // up arrow
+            const upArrow = document.createElement("button");
+            upArrow.id = `up-${tier}`;
+            upArrow.className = "up-arrow";
+            upArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>';
+            upArrow.addEventListener("click", moveRowUp);
+
+            // down arrow
+            const downArrow = document.createElement("button");
+            downArrow.id = `down-${tier}`;
+            downArrow.className = "down-arrow";
+            downArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-down fa-xl"></i>';
+            downArrow.addEventListener("click", moveRowDown);
+
+            tab.appendChild(palette);
+            tab.appendChild(trash);
+            tab.appendChild(upArrow);
+            tab.appendChild(downArrow);
+        }
+
+        function changeColor(ev) {
+            const row = ev.currentTarget.closest(".row");
+            const label = row.querySelector(".tier-label");
+
+            const colorInput = document.createElement("input");
+            colorInput.type = "color";
+            colorInput.value = rgbToHex(getComputedStyle(label).backgroundColor); 
+
+            colorInput.addEventListener("input", () => {
+                label.style.backgroundColor = colorInput.value;
+            });
+            colorInput.click();
+        }
+        function rgbToHex(rgb) {
+            const result = rgb.match(/\d+/g);
+            return result
+                ? "#" + result.map(x => (+x).toString(16).padStart(2, "0")).join("")
+                : "#ffffff";
+        }
+
+        function deleteTierFunction(ev) {
+            const row = ev.currentTarget.closest(".row");
+
+            const container = row.parentElement;
+            const allRows = container.querySelectorAll(".row");
+
+            if (allRows.length > 1) {
+                row.remove();
+            } else {
+                alert("Cannot have a list with no rows, dickhead.");
+            }
+        }
+
+        function moveRowUp(ev) {
+            const row = ev.currentTarget.closest(".row");
+            const prevRow = row.previousElementSibling;
+
+            if (prevRow) {
+                row.parentElement.insertBefore(row, prevRow);
+
+                // Add temporary highlight
+                row.classList.add("moved");
+                setTimeout(() => row.classList.remove("moved"), 500); // remove after 0.5s
+            } else {
+                alert("This row is already at the top, dickhead.");
+            }
+        }
+
+        function moveRowDown(ev) {
+            const row = ev.currentTarget.closest(".row");
+            const nextRow = row.nextElementSibling;
+
+            if (nextRow) {
+                row.parentElement.insertBefore(nextRow, row);
+
+                // Add temporary highlight
+                row.classList.add("moved");
+                setTimeout(() => row.classList.remove("moved"), 500); // remove after 0.5s
+            } else {
+                alert("This row is already at the bottom, dickhead.");
+            }
+        }
+    })
+</script>

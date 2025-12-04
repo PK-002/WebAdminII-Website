@@ -8,7 +8,6 @@
 #row-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   width: 60%;
   margin: 20px auto;
 }
@@ -20,11 +19,15 @@ div.row {
   height: 100px;
   width: 100%;
   margin-bottom: 5px;
+  box-sizing: border-box;
 }
 
 .tier-label {
   aspect-ratio: 1 / 1;
   background-color: lightgray;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 150%;
+  font-weight: bold;
   text-align: center;
   display: flex;
   align-items: center;
@@ -113,3 +116,72 @@ tbody tr:nth-child(odd) {
   justify-self: center;
   justify-content: center;
 }
+/* Tier Settings Grid */
+.tier-settings {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0px;
+}
+
+.palette{
+  justify-self: center;
+  align-self: center;
+  height: 90%;
+  width: 90%;
+  border-radius: 20%;
+  background-color: rgb(255, 245, 157);
+  border-style: none;
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.trash{
+  justify-self: center;
+  align-self: center;
+  height: 90%;
+  width: 90%;
+  border-radius: 20%;
+  background-color: rgb(200, 200, 200);
+  border-style: none;
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.up-arrow{
+  justify-self: center;
+  align-self: center;
+  height: 90%;
+  width: 90%;
+  border-radius: 20%;
+  background-color: rgb(172, 255, 172);
+  border-style: none;
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.down-arrow{
+  justify-self: center;
+  align-self: center;
+  height: 90%;
+  width: 90%;
+  border-radius: 20%;
+  background-color: #ffa3a3;
+  border-style: none;
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.gear, .trash, .up-arrow, .down-arrow {
+  cursor: pointer;
+}
+
+.row.moved {
+    outline: 5px solid rgb(0, 211, 253);
+    outline-offset: -2px; 
+}
+

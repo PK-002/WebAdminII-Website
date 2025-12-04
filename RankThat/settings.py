@@ -33,7 +33,7 @@ CSRF_TRUSTED_ORIGINS = ['https://webadminii-website.onrender.com', 'http://webad
 # Application definition
 
 INSTALLED_APPS = [
-    'bootstrap5',
+    'django_bootstrap5',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
