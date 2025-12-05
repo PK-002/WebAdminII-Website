@@ -34,12 +34,11 @@
         </h2>
         {% endif %}
       </div>
-
-      <a href="/">Home</a>
-      |
-      <a href="/discover">Discover</a>
-      |
-      <a href="/new">Create</a>
+      <div id="nav-bar">
+        <a href="/" id="home-button">HOME</a>
+        <a href="/discover" id="discover-button">DISCOVER</a>
+        <a href="/new" id="create-button">CREATE</a>
+      </div>
     </header>
     <main>{% block content %} {% endblock %}</main>
   </body>
