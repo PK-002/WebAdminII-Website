@@ -1,43 +1,23 @@
 {% load static %}
 <div id="unassigned" class="row">
-  <!-- <img
-    src="{% static 'TierList/blackcrewpng.png' %}"
-    alt="My image"
+  {% for image in images %}
+  <img
+    src="{{ image.image.url }}"
+    alt="Unassigned image"
     width="100px"
-    id="img1"
+    height="auto"
+    id="img{{ forloop.counter }}"
     draggable="true"
     ondragstart="dragstartHandler(event)"
   />
-  <img
-    src="{% static 'TierList/bluecrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img2"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
-  <img
-    src="{% static 'TierList/greencrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img3"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  />
-  <img
-    src="{% static 'TierList/redcrewpng.png' %}"
-    alt="My image"
-    width="100px"
-    id="img4"
-    draggable="true"
-    ondragstart="dragstartHandler(event)"
-  /> -->
+  {% endfor %}
 </div>
 
 <script>
+  let image_count = 0
   document.addEventListener('DOMContentLoaded', function () {
     document
-      .getElementById('imageList')
+      .getElementById('images')
       .addEventListener('change', function (event) {
         // Need to make sure there is an imageUpload element in the HTML
         const files = event.target.files

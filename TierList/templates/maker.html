@@ -1,75 +1,144 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
+<script>
+  var ranking_config = new Map()
+  ranking_config.set(
+    'rows',
+    new Map([
+      ['S', []],
+      ['A', []],
+      ['B', []],
+      ['C', []],
+      ['D', []],
+      ['F', []]
+    ])
+  )
+  ranking_config.set('unassigned', [])
+</script>
+
+<div id="myPopup" class="popup-overlay">
+  <div class="popup-content">
+    <h2>Download</h2>
+    <p>This will show you a preview of your ranking before downloading it.</p>
+
+    <button onclick="closePopup()">Close</button>
+
+    <button id="downloadButton">Download Ranking as PNG</button>
+    <div id="render"></div>
+  </div>
+</div>
 
 <p id="pagetitle">MAKE YOUR TIER LIST</p>
 <div id="ranking">
-  {% include 'rows.html' %}
-  {% include 'unassigned.html' %}
+  {% include 'rows.html' %} {% include 'unassigned.html' %}
 </div>
 
 <div id="submit-form">
-  <p>SUBMIT</p>
-  <form action="/maker/" method="post">
-    {% csrf_token %}
-    <input type="text" name="title" placeholder="Tier List Title" required />
-    <select id="ranking_type" name="ranking_type">
-      <option value="template" selected>Template</option>
-      <option value="ordering">Ordering</option>
-    </select>
-    <input type="hidden" name="ranking_data" id="ranking_data" />
-    <button type="submit" onclick="submit_data()">Submit Tier List</button>
-  </form>
-</div>
+  <input type="file" id="images" accept="image/*" multiple />
 
-<script>
+  <div>
+    <button onclick="openPopup()">Download</button>
+  </div>
 
-  var selected = null
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    var selected = null
 
-  function dragstartHandler(ev) {
-    console.log('Drag Start Event Triggered', ev.srcElement.src)
-    selected = ev.srcElement.src
+    function openPopup() {
+      document.getElementById('myPopup').style.display =
+        'flex' /* Use flex to center content */
 
-    // Add the id of the dragged element to the dataTransfer object
-    ev.dataTransfer.setData('text/plain', ev.target.id)
-    ev.dataTransfer.effectAllowed = 'move' // Optional: specify drag effect
-  }
+      // May change the function back to this VVV but for now we just need row-container
+      // html2canvas(document.querySelector('#render')).then((canvas) => {
+      // make all elements with tier-settings hidden while we render
+      document
+        .querySelectorAll('.tier-settings')
+        .forEach((el) => (el.style.display = 'none'))
 
-  function dragoverHandler(ev) {
-    // Prevent default behavior to allow drop
-    ev.preventDefault()
-    ev.dataTransfer.dropEffect = 'move' // Optional: specify drop effect
-  }
+      html2canvas(document.querySelector('#row-container')).then((canvas) => {
+        const renderDiv = document.querySelector('#render')
+        renderDiv.innerHTML = '' // Clear previous content
+        renderDiv.appendChild(canvas)
 
-  function dropHandler(ev) {
-    ev.preventDefault()
-    // Get the id of the dragged element
-    const data = ev.dataTransfer.getData('text/plain')
-    const draggedElement = document.getElementById(data)
+        canvas.style.maxWidth = '100%'
+        canvas.style.height = 'auto'
 
-    // Append the dragged element to the drop target
-    // Check if the target is a valid drop zone
-    if (ev.target.classList.contains('drop-zone')) {
-      console.log(ev.target.id)
-      console.log(ev.dataTransfer)
-      ev.target.appendChild(draggedElement)
-      ranking.rows[ev.target.id.toUpperCase()].push(selected)
-      selected = null
-      console.log(ranking)
+        document
+          .getElementById('downloadButton')
+          .addEventListener('click', function () {
+            const dataURL = canvas.toDataURL('image/png')
+            const downloadLink = document.createElement('a')
+            downloadLink.href = dataURL
+            downloadLink.download = 'my-ranking.png'
+            downloadLink.click()
+            downloadLink.remove()
+          })
+      })
     }
-  }
 
-  function submit_data() {
-    if (document.getElementById('unassigned').children.length > 0) {
-      for (
-        let i = 0;
-        i < document.getElementById('unassigned').children.length;
-        i++
-      ) {
-        ranking.unassigned.push(
-          document.getElementById('unassigned').children[i].src
-        )
+    function closePopup() {
+      document
+        .querySelectorAll('.tier-settings')
+        .forEach((el) => (el.style.display = 'grid'))
+      document.getElementById('myPopup').style.display = 'none'
+    }
+
+    // Optional: Close the popup when clicking outside the content
+    window.onclick = function (event) {
+      if (event.target == document.getElementById('myPopup')) {
+        document
+          .querySelectorAll('.tier-settings')
+          .forEach((el) => (el.style.display = 'grid'))
+        document.getElementById('myPopup').style.display = 'none'
       }
     }
-    document.getElementById('ranking_data').value = JSON.stringify(ranking)
-  }
-</script>
-{% endblock %}
+
+    function dragstartHandler(ev) {
+      console.log('Drag Start Event Triggered', ev.srcElement.src)
+      selected = ev.srcElement.src
+
+      // Add the id of the dragged element to the dataTransfer object
+      ev.dataTransfer.setData('text/plain', ev.target.id)
+      ev.dataTransfer.effectAllowed = 'move' // Optional: specify drag effect
+    }
+
+    function dragoverHandler(ev) {
+      // Prevent default behavior to allow drop
+      ev.preventDefault()
+      ev.dataTransfer.dropEffect = 'move' // Optional: specify drop effect
+    }
+
+    function dropHandler(ev) {
+      ev.preventDefault()
+      // Get the id of the dragged element
+      const data = ev.dataTransfer.getData('text/plain')
+      const draggedElement = document.getElementById(data)
+
+      // Append the dragged element to the drop target
+      // Check if the target is a valid drop zone
+      if (ev.target.classList.contains('drop-zone')) {
+        console.log(ev.target.id)
+        console.log(ev.dataTransfer)
+        ev.target.appendChild(draggedElement)
+        ranking.rows[ev.target.id.toUpperCase()].push(selected)
+        selected = null
+        console.log(ranking)
+      }
+    }
+
+    function submit_data() {
+      if (document.getElementById('unassigned').children.length > 0) {
+        for (
+          let i = 0;
+          i < document.getElementById('unassigned').children.length;
+          i++
+        ) {
+          ranking.unassigned.push(
+            document.getElementById('unassigned').children[i].src
+          )
+        }
+      }
+      document.getElementById('ranking_data').value = JSON.stringify(ranking)
+    }
+  </script>
+  {% endblock %}
+</div>
