@@ -67,14 +67,14 @@
             trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>';
             trash.addEventListener("click", deleteTierFunction);
 
-            // up arrow
+            //up arrow
             const upArrow = document.createElement("button");
             upArrow.id = `up-${tier}`;
             upArrow.className = "up-arrow";
             upArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>';
             upArrow.addEventListener("click", moveRowUp);
 
-            // down arrow
+            //down arrow
             const downArrow = document.createElement("button");
             downArrow.id = `down-${tier}`;
             downArrow.className = "down-arrow";
