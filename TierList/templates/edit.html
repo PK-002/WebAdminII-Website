@@ -37,9 +37,9 @@
   {% include 'rows.html' %} {% include 'unassigned.html' with images=images %}
 </div>
 
-<!-- <div id="submit-form">
-  <input type="file" id="images" accept="image/*" multiple />
-</div> -->
+<div id="submit-form">
+  <input type="hidden" id="images" accept="image/*" multiple />
+</div>
 <div>
   <button onclick="openPopup()">Download</button>
 </div>
@@ -109,17 +109,24 @@
 
   function dropHandler(ev) {
     ev.preventDefault()
-    // Get the id of the dragged element
     const data = ev.dataTransfer.getData('text/plain')
     const draggedElement = document.getElementById(data)
 
+    // Remove the dragged item from all rows in the map
+    for (const [rowKey, items] of ranking_config.get('rows').entries()) {
+      const idx = items.indexOf(draggedElement.src)
+      if (idx !== -1) {
+        items.splice(idx, 1)
+      }
+    }
+
     // Append the dragged element to the drop target
-    // Check if the target is a valid drop zone
     if (ev.target.classList.contains('drop-zone')) {
-      console.log(ev.target.id)
-      console.log(ev.dataTransfer)
       ev.target.appendChild(draggedElement)
-      ranking_config.get('rows').get(ev.target.id.toUpperCase()).push(selected)
+      ranking_config
+        .get('rows')
+        .get(ev.target.id.toUpperCase())
+        .push(draggedElement.src)
       selected = null
       console.log(ranking_config)
     }
