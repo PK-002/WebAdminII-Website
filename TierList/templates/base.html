@@ -18,8 +18,13 @@
         style="display: flex; justify-content: space-between"
       >
         <h2>
-          <!-- logo -->
-          <img src="{% static 'logo.png' %}" alt="Logo">
+          <img
+            src="{% static 'TierList/logo.png' %}"
+            alt="My image"
+            width="100px"
+            draggable="true"
+            ondragstart="dragstartHandler(event)"
+          />
         </h2>
         {% if user.is_authenticated %}
         <h2>

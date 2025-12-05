@@ -1,7 +1,21 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 
+{% load social_share %} 
 <div>
+  <div id="myPopup" class="popup-overlay">
+    <div class="popup-content">
+      <h2>Download</h2>
+      <p>This will show you a preview of your ranking before downloading it.</p>
+
+      <button onclick="closePopup()">Close</button>
+
+      <button id="downloadButton">Download Ranking as PNG</button>
+      <div id="render"></div>
+    </div>
+  </div>
+
   <h1>{{ ranking.list_name }}</h1>
+  <h3>Author: {{ ranking.author.username }}</h3>
   <h3>Created at: {{ ranking.creation_date }}</h3>
 
   <div id="row-container">
@@ -18,10 +32,70 @@
     </div>
     {% endfor %}
   </div>
+
+  {% if request.user == ranking.author %}
+  <a href="/edit/{{ ranking.id }}/"><button>Edit Ranking</button></a>
+  <br />
+  {% endif %}
+
+  <div style="display: flex;">
+    <button id="downloadButton" onclick="openPopup()">
+      Download Ranking as PNG
+    </button>
+
+    <div style="margin-left: auto;">
+    {% send_email "My ranking" "Check out my ranking:" request.build_absolute_uri "<i class='fa-solid fa-envelope'></i>"%}
+    {% post_to_facebook request.build_absolute_uri "<i class='fa-brands fa-facebook'></i>" %}
+    {% post_to_twitter "Check out this page!" request.build_absolute_uri "<i class='fa-brands fa-twitter'></i>" %}
+    </div>
+  </div>
+
+
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   const tierConfig = {{ ranking.tier_config|safe }};
   console.log(tierConfig);
+
+  function openPopup() {
+      document.getElementById('myPopup').style.display =
+        'flex' /* Use flex to center content */
+
+      // May change the function back to this VVV but for now we just need row-container
+      // html2canvas(document.querySelector('#render')).then((canvas) => {
+      html2canvas(document.querySelector('#row-container')).then((canvas) => {
+        const renderDiv = document.querySelector('#render')
+        renderDiv.innerHTML = '' // Clear previous content
+        renderDiv.appendChild(canvas)
+
+        canvas.style.maxWidth = '100%'
+        canvas.style.height = 'auto'
+
+        document
+          .getElementById('downloadButton')
+          .addEventListener('click', function () {
+            const dataURL = canvas.toDataURL('image/png')
+            const downloadLink = document.createElement('a')
+            downloadLink.href = dataURL
+            downloadLink.download = 'my-ranking.png'
+            downloadLink.click()
+            downloadLink.remove()
+          })
+      })
+    }
+
+    function closePopup() {
+      document.getElementById('myPopup').style.display = 'none'
+    }
+
+
+        // Optional: Close the popup when clicking outside the content
+    window.onclick = function (event) {
+      if (event.target == document.getElementById('myPopup')) {
+        document.getElementById('myPopup').style.display = 'none'
+      }
+    }
 </script>
 {% endblock %}
