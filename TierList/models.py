@@ -5,7 +5,14 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 
+from django.conf import settings
+
 class Ranking(models.Model):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,  
+        related_name='rankings'
+    )
     list_name = models.CharField(max_length=200)
     creation_date = models.DateTimeField("date created")
     image_url = models.URLField(blank=True,null=True)

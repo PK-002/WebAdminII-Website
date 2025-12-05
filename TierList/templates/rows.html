@@ -1,153 +1,161 @@
 {% load static %}
 <div id="row-container"></div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var ranking = {
-            rows: {
-                S: [],
-                A: [],
-                B: [],
-                C: [],
-                D: [],
-                F: []
-            },
-            unassigned: []
-        }
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log(ranking_config)
+    const container = document.getElementById('row-container')
+    //create rows based on ranking.rows keys
+    for (const key of ranking_config.get('rows').keys()) {
+      //rows themselves
+      const tier_row = document.createElement('div')
+      tier_row.id = `row${key}`
+      tier_row.className = 'row'
 
-        const container = document.getElementById("row-container");
-        //create rows based on ranking.rows keys
-        for (const key in ranking.rows) {
+      //left side labels
+      const label = document.createElement('div')
+      label.id = `label${key}`
+      label.className = 'tier-label'
+      label.textContent = key
 
-            //rows themselves
-            const tier_row = document.createElement("div");
-            tier_row.id = `row${key}`;
-            tier_row.className = "row";
+      //dropzones
+      const dropzone = document.createElement('div')
+      dropzone.id = `${key}`
+      dropzone.addEventListener('drop', dropHandler)
+      dropzone.addEventListener('dragover', dragoverHandler)
+      dropzone.className = 'drop-zone'
 
-            //left side labels
-            const label = document.createElement("div");
-            label.id = `label${key}`;
-            label.className = "tier-label";
-            label.textContent = key;
+      //settings
+      const settings = document.createElement('div')
+      settings.id = `settings${key}`
+      settings.className = 'tier-settings'
 
-            //dropzones
-            const dropzone = document.createElement("div");
-            dropzone.id = `dropzone${key}`;
-            dropzone.addEventListener("drop", dropHandler);
-            dropzone.addEventListener("dragover", dragoverHandler);
-            dropzone.className = "drop-zone";
+      //append all to the rows
+      tier_row.appendChild(label)
+      tier_row.appendChild(dropzone)
+      tier_row.appendChild(settings)
+      container.appendChild(tier_row)
+    }
 
-            //settings
-            const settings = document.createElement("div");
-            settings.id = `settings${key}`;
-            settings.className = "tier-settings";
+    settings_tabs = document.getElementsByClassName('tier-settings')
 
-            //append all to the rows
-            tier_row.appendChild(label);
-            tier_row.appendChild(dropzone);
-            tier_row.appendChild(settings);
-            container.appendChild(tier_row);
-        }
+    for (const tab of settings_tabs) {
+      const tier = tab.id.replace('settings', '') // S, A, B, ...
 
-        settings_tabs = document.getElementsByClassName("tier-settings");
+      // gear button
+      const palette = document.createElement('button')
+      palette.id = `palette-${tier}`
+      palette.className = 'palette'
+      palette.innerHTML = '<i class="fa-slab fa-regular fa-palette fa-xl"></i>'
+      palette.addEventListener('click', changeColor)
 
-        for (const tab of settings_tabs) {
-            const tier = tab.id.replace("settings", "");  // S, A, B, ...
+      // trash button
+      const trash = document.createElement('button')
+      trash.id = `trash-${tier}`
+      trash.className = 'trash'
+      trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>'
+      trash.addEventListener('click', deleteTierFunction)
 
-            // gear button
-            const palette = document.createElement("button");
-            palette.id = `palette-${tier}`;
-            palette.className = "palette";
-            palette.innerHTML = '<i class="fa-slab fa-regular fa-palette fa-xl"></i>';
-            palette.addEventListener("click", changeColor);
+      // up arrow
+      const upArrow = document.createElement('button')
+      upArrow.id = `up-${tier}`
+      upArrow.className = 'up-arrow'
+      upArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>'
+      upArrow.addEventListener('click', moveRowUp)
 
-            // trash button
-            const trash = document.createElement("button");
-            trash.id = `trash-${tier}`;
-            trash.className = "trash";
-            trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>';
-            trash.addEventListener("click", deleteTierFunction);
+      // down arrow
+      const downArrow = document.createElement('button')
+      downArrow.id = `down-${tier}`
+      downArrow.className = 'down-arrow'
+      downArrow.innerHTML =
+        '<i class="fa-slab fa-regular fa-angle-down fa-xl"></i>'
+      downArrow.addEventListener('click', moveRowDown)
 
-            // up arrow
-            const upArrow = document.createElement("button");
-            upArrow.id = `up-${tier}`;
-            upArrow.className = "up-arrow";
-            upArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>';
-            upArrow.addEventListener("click", moveRowUp);
+      tab.appendChild(palette)
+      tab.appendChild(trash)
+      tab.appendChild(upArrow)
+      tab.appendChild(downArrow)
+    }
 
-            // down arrow
-            const downArrow = document.createElement("button");
-            downArrow.id = `down-${tier}`;
-            downArrow.className = "down-arrow";
-            downArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-down fa-xl"></i>';
-            downArrow.addEventListener("click", moveRowDown);
+    function changeColor(ev) {
+      const row = ev.currentTarget.closest('.row')
+      const label = row.querySelector('.tier-label')
 
-            tab.appendChild(palette);
-            tab.appendChild(trash);
-            tab.appendChild(upArrow);
-            tab.appendChild(downArrow);
-        }
+      const colorInput = document.createElement('input')
+      colorInput.type = 'color'
+      colorInput.value = rgbToHex(getComputedStyle(label).backgroundColor)
 
-        function changeColor(ev) {
-            const row = ev.currentTarget.closest(".row");
-            const label = row.querySelector(".tier-label");
+      colorInput.addEventListener('input', () => {
+        label.style.backgroundColor = colorInput.value
+      })
+      colorInput.click()
+    }
+    function rgbToHex(rgb) {
+      const result = rgb.match(/\d+/g)
+      return result
+        ? '#' + result.map((x) => (+x).toString(16).padStart(2, '0')).join('')
+        : '#ffffff'
+    }
 
-            const colorInput = document.createElement("input");
-            colorInput.type = "color";
-            colorInput.value = rgbToHex(getComputedStyle(label).backgroundColor); 
+    function deleteTierFunction(ev) {
+      const row = ev.currentTarget.closest('.row')
 
-            colorInput.addEventListener("input", () => {
-                label.style.backgroundColor = colorInput.value;
-            });
-            colorInput.click();
-        }
-        function rgbToHex(rgb) {
-            const result = rgb.match(/\d+/g);
-            return result
-                ? "#" + result.map(x => (+x).toString(16).padStart(2, "0")).join("")
-                : "#ffffff";
-        }
+      const container = row.parentElement
+      const allRows = container.querySelectorAll('.row')
 
-        function deleteTierFunction(ev) {
-            const row = ev.currentTarget.closest(".row");
+      if (allRows.length > 1) {
+        row.remove()
+        ranking_config.get('rows').delete(row.id.replace('row', ''))
+      } else {
+        alert('Cannot have a list with no rows, dickhead.')
+      }
+    }
 
-            const container = row.parentElement;
-            const allRows = container.querySelectorAll(".row");
+    function moveRowUp(ev) {
+      const row = ev.currentTarget.closest('.row')
+      const prevRow = row.previousElementSibling
 
-            if (allRows.length > 1) {
-                row.remove();
-            } else {
-                alert("Cannot have a list with no rows, dickhead.");
-            }
-        }
+      if (prevRow) {
+        row.parentElement.insertBefore(row, prevRow)
 
-        function moveRowUp(ev) {
-            const row = ev.currentTarget.closest(".row");
-            const prevRow = row.previousElementSibling;
+        const entries = Array.from(ranking_config.entries())
+        const indexA = entries.findIndex(
+          ([key]) => key === row.id.replace('row', '')
+        )
+        const indexB = entries.findIndex(
+          ([key]) => key === prevRow.id.replace('row', '')
+        )
 
-            if (prevRow) {
-                row.parentElement.insertBefore(row, prevRow);
+        // Swap elements at indexA and indexB
+        ;[entries[indexA], entries[indexB]] = [entries[indexB], entries[indexA]]
 
-                // Add temporary highlight
-                row.classList.add("moved");
-                setTimeout(() => row.classList.remove("moved"), 500); // remove after 0.5s
-            } else {
-                alert("This row is already at the top, dickhead.");
-            }
-        }
+        ranking_config = new Map(entries)
+        const rankingConfigEvent = new CustomEvent('rankingConfig', {
+          detail: { newMap: ranking_config }
+        })
+        document.dispatchEvent(rankingConfigEvent)
 
-        function moveRowDown(ev) {
-            const row = ev.currentTarget.closest(".row");
-            const nextRow = row.nextElementSibling;
+        console.log(ranking_config)
+        // Add temporary highlight
+        row.classList.add('moved')
+        setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
+      } else {
+        alert('This row is already at the top, dickhead.')
+      }
+    }
 
-            if (nextRow) {
-                row.parentElement.insertBefore(nextRow, row);
+    function moveRowDown(ev) {
+      const row = ev.currentTarget.closest('.row')
+      const nextRow = row.nextElementSibling
 
-                // Add temporary highlight
-                row.classList.add("moved");
-                setTimeout(() => row.classList.remove("moved"), 500); // remove after 0.5s
-            } else {
-                alert("This row is already at the bottom, dickhead.");
-            }
-        }
-    })
+      if (nextRow) {
+        row.parentElement.insertBefore(nextRow, row)
+
+        // Add temporary highlight
+        row.classList.add('moved')
+        setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
+      } else {
+        alert('This row is already at the bottom, dickhead.')
+      }
+    }
+  })
 </script>

@@ -18,7 +18,14 @@
         style="display: flex; justify-content: space-between"
       >
         <h2>
-          <b><i class="fa-solid fa-scale-unbalanced fa-2x"></i>RANK THAT</b>
+          <img
+            src="{% static 'TierList/logo.png' %}"
+            alt="My image"
+            width="100px"
+            id="img1"
+            draggable="true"
+            ondragstart="dragstartHandler(event)"
+          />
         </h2>
         {% if user.is_authenticated %}
         <h2>
