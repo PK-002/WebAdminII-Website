@@ -106,7 +106,7 @@
         row.remove()
         ranking_config.get('rows').delete(row.id.replace('row', ''))
       } else {
-        alert('Cannot have a list with no rows, dickhead.')
+        alert('Cannot have a list with no rows.')
       }
     }
 
@@ -139,7 +139,7 @@
         row.classList.add('moved')
         setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
       } else {
-        alert('This row is already at the top, dickhead.')
+        alert('This row is already at the top.')
       }
     }
 
@@ -154,7 +154,7 @@
         row.classList.add('moved')
         setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
       } else {
-        alert('This row is already at the bottom, dickhead.')
+        alert('This row is already at the bottom.')
       }
     }
   })
