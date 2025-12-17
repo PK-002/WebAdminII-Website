@@ -1,18 +1,17 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 <script>
-  var ranking_config = new Map()
-  ranking_config.set(
-    'rows',
-    new Map([
-      ['S', []],
-      ['A', []],
-      ['B', []],
-      ['C', []],
-      ['D', []],
-      ['F', []]
-    ])
-  )
-  ranking_config.set('unassigned', [])
+  var default_tiers = {
+    S: { images: [], color: '#C0C0C0', name: 'S' },
+    A: { images: [], color: '#C0C0C0', name: 'A' },
+    B: { images: [], color: '#C0C0C0', name: 'B' },
+    C: { images: [], color: '#C0C0C0', name: 'C' },
+    D: { images: [], color: '#C0C0C0', name: 'D' },
+    F: { images: [], color: '#C0C0C0', name: 'F' }
+  }
+
+  var ranking_config = {}
+  ranking_config.rows = new Map(Object.entries(default_tiers))
+  ranking_config.unassigned = []
 </script>
 
 <div id="myPopup" class="popup-overlay">
@@ -54,7 +53,9 @@
         .querySelectorAll('.tier-settings')
         .forEach((el) => (el.style.display = 'none'))
 
-      html2canvas(document.querySelector('#row-container')).then((canvas) => {
+      html2canvas(document.querySelector('#row-container'), {
+        foreignObjectRendering: false
+      }).then((canvas) => {
         const renderDiv = document.querySelector('#render')
         renderDiv.innerHTML = '' // Clear previous content
         renderDiv.appendChild(canvas)
@@ -93,7 +94,6 @@
     }
 
     function dragstartHandler(ev) {
-      console.log('Drag Start Event Triggered', ev.srcElement.src)
       selected = ev.srcElement.src
 
       // Add the id of the dragged element to the dataTransfer object
@@ -116,12 +116,11 @@
       // Append the dragged element to the drop target
       // Check if the target is a valid drop zone
       if (ev.target.classList.contains('drop-zone')) {
-        console.log(ev.target.id)
-        console.log(ev.dataTransfer)
         ev.target.appendChild(draggedElement)
-        ranking.rows[ev.target.id.toUpperCase()].push(selected)
+        ranking_config.rows
+          .get(ev.target.id.toUpperCase())
+          .images.push(draggedElement.src)
         selected = null
-        console.log(ranking)
       }
     }
 

@@ -17,15 +17,14 @@
   <h1>{{ ranking.list_name }}</h1>
   <h3>Author: {{ ranking.author.username }}</h3>
   <h3>Created at: {{ ranking.creation_date }}</h3>
-
   <div id="row-container">
-    {% for tier, items in ranking.tier_config.rows.items %}
+    {% for tier, row in ranking.tier_config.rows.items %}
     <div class="row">
-      <div class="tier-label">{{ tier }}</div>
+      <div class="tier-label" style="background-color: {{ row.color }};">{{ row.name }}</div>
       <div class="drop-zone">
-        {% for item in items %}
+        {% for image in row.images %}
 
-        <img src="{{ item }}" width="100" height="100" />
+        <img src="{{ image }}" width="100" height="100" />
 
         {% endfor %}
       </div>

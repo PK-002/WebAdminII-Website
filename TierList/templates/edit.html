@@ -1,23 +1,8 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
 <script>
-  var ranking_config = new Map()
-  ranking_config.set(
-    'rows',
-    new Map([
-      ['S', []],
-      ['A', []],
-      ['B', []],
-      ['C', []],
-      ['D', []],
-      ['F', []]
-    ])
-  )
-  ranking_config.set('unassigned', [])
-
-  document.addEventListener('rankingConfig', (event) => {
-    console.log('CHANGE')
-    ranking_config = event.detail.newMap
-  })
+  var ranking_config = {}
+    ranking_config.rows = new Map(Object.entries({{ ranking.tier_config.rows|safe }}))
+    ranking_config.unassigned = {{ ranking.tier_config.unassigned|safe }};
 </script>
 
 <div id="myPopup" class="popup-overlay">
@@ -60,6 +45,11 @@
 
     // May change the function back to this VVV but for now we just need row-container
     // html2canvas(document.querySelector('#render')).then((canvas) => {
+
+    document
+      .querySelectorAll('.tier-settings')
+      .forEach((el) => (el.style.display = 'none'))
+
     html2canvas(document.querySelector('#row-container')).then((canvas) => {
       const renderDiv = document.querySelector('#render')
       renderDiv.innerHTML = '' // Clear previous content
@@ -82,18 +72,23 @@
   }
 
   function closePopup() {
+    document
+      .querySelectorAll('.tier-settings')
+      .forEach((el) => (el.style.display = 'grid'))
     document.getElementById('myPopup').style.display = 'none'
   }
 
   // Optional: Close the popup when clicking outside the content
   window.onclick = function (event) {
     if (event.target == document.getElementById('myPopup')) {
+      document
+        .querySelectorAll('.tier-settings')
+        .forEach((el) => (el.style.display = 'grid'))
       document.getElementById('myPopup').style.display = 'none'
     }
   }
 
   function dragstartHandler(ev) {
-    console.log('Drag Start Event Triggered', ev.srcElement.src)
     selected = ev.srcElement.src
 
     // Add the id of the dragged element to the dataTransfer object
@@ -112,31 +107,29 @@
     const data = ev.dataTransfer.getData('text/plain')
     const draggedElement = document.getElementById(data)
 
-    // Remove the dragged item from all rows in the map
-    for (const [rowKey, items] of ranking_config.get('rows').entries()) {
-      const idx = items.indexOf(draggedElement.src)
+    // Remove the dragged item from all rows in the javascript object
+    for (const [rowKey, rowData] of ranking_config.rows.entries()) {
+      const idx = rowData.images.indexOf(draggedElement.src)
       if (idx !== -1) {
-        items.splice(idx, 1)
+        rowData.images.splice(idx, 1)
       }
     }
 
     // Append the dragged element to the drop target
     if (ev.target.classList.contains('drop-zone')) {
       ev.target.appendChild(draggedElement)
-      ranking_config
-        .get('rows')
+      ranking_config.rows
         .get(ev.target.id.toUpperCase())
-        .push(draggedElement.src)
+        .images.push(draggedElement.src)
       selected = null
-      console.log(ranking_config)
     }
   }
 
   function submit_data() {
     let obj = {}
 
-    obj['rows'] = Object.fromEntries(ranking_config.get('rows'))
-    obj['unassigned'] = ranking_config.get('unassigned')
+    obj['rows'] = Object.fromEntries(ranking_config.rows)
+    obj['unassigned'] = ranking_config.unassigned
 
     document.getElementById('tier_config').value = JSON.stringify(obj)
   }

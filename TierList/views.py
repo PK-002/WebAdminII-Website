@@ -24,7 +24,13 @@ def config(request):
         form = TierListForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data['title']
-            ranking_data = {"rows": {}, "unassigned": []}
+            ranking_data = {"rows": {0: { "images": [], "color": '#C0C0C0', "name": 'S' },
+                                     1: { "images": [], "color": '#C0C0C0', "name": 'A' },
+                                     2: { "images": [], "color": '#C0C0C0', "name": 'B' },
+                                     3: { "images": [], "color": '#C0C0C0', "name": 'C' },
+                                     4: { "images": [], "color": '#C0C0C0', "name": 'D' },
+                                     5: { "images": [], "color": '#C0C0C0', "name": 'F' }
+                            }, "unassigned": []}
             ranking = Ranking.objects.create(
                 list_name=title,
                 creation_date=datetime.now(),
@@ -36,7 +42,7 @@ def config(request):
             for image in images:
                 Image.objects.create(ranking=ranking, image=image)
             return redirect('edit', ranking_id=ranking.id)
-    else:
+    else:   
         form = TierListForm()
     return render(request, 'config.html', {'form': form})
 

@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   width: 60%;
-  margin: 20px auto;
+  margin: 10px auto;
 }
 
 div.row {
@@ -23,15 +23,19 @@ div.row {
 }
 
 .tier-label {
-  aspect-ratio: 1 / 1;
-  background-color: lightgray;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  font-size: 150%;
-  font-weight: bold;
-  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100px;
+  min-width: 100px;
+  font-weight: bold;
+  text-align: center;
+  background-color: lightgray;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  line-height: normal;
 }
 
 #sort {
@@ -128,7 +132,7 @@ tbody tr:nth-child(odd) {
   gap: 0px;
 }
 
-.palette{
+.palette {
   justify-self: center;
   align-self: center;
   height: 90%;
@@ -140,7 +144,7 @@ tbody tr:nth-child(odd) {
   grid-column: 2;
 }
 
-.trash{
+.trash {
   justify-self: center;
   align-self: center;
   height: 90%;
@@ -152,7 +156,7 @@ tbody tr:nth-child(odd) {
   grid-column: 2;
 }
 
-.up-arrow{
+.up-arrow {
   justify-self: center;
   align-self: center;
   height: 90%;
@@ -164,7 +168,7 @@ tbody tr:nth-child(odd) {
   grid-column: 1;
 }
 
-.down-arrow{
+.down-arrow {
   justify-self: center;
   align-self: center;
   height: 90%;
@@ -176,13 +180,56 @@ tbody tr:nth-child(odd) {
   grid-column: 1;
 }
 
-.gear, .trash, .up-arrow, .down-arrow {
+.add {
+  /* position: fixed; */
+  bottom: 15px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgb(150, 247, 236);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+
+.gear,
+.trash,
+.up-arrow,
+.down-arrow {
   cursor: pointer;
 }
 
+.add-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* or set a specific width if needed */
+}
+
+.ai {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgb(172, 255, 172);
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+}
+
 .row.moved {
-    outline: 5px solid rgb(0, 211, 253);
-    outline-offset: -2px; 
+  outline: 5px solid rgb(0, 211, 253);
+  outline-offset: -2px;
 }
 
 /*nav bar styles*/
@@ -240,7 +287,7 @@ tbody tr:nth-child(odd) {
   font-weight: bold;
   text-decoration: none;
   color: rgb(3, 81, 3);
-  background-color:rgb(172, 255, 172);
+  background-color: rgb(172, 255, 172);
   transition: background-color 0.2s;
 }
 
@@ -273,7 +320,7 @@ tbody tr:nth-child(odd) {
   font-weight: bold;
   text-decoration: none;
   color: rgb(135, 6, 6);
-  background-color:rgb(248, 94, 94);
+  background-color: rgb(248, 94, 94);
   transition: background-color 0.2s;
 }
 

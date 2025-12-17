@@ -1,79 +1,91 @@
 {% load static %}
+<div class="add-button-container">
+  <button id="add" class="add">
+    <i class="fa-slab fa-regular fa-plus"></i>
+  </button>
+</div>
 <div id="row-container"></div>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    console.log(ranking_config)
-    const container = document.getElementById('row-container')
-    //create rows based on ranking.rows keys
-    for (const key of ranking_config.get('rows').keys()) {
-      //rows themselves
-      const tier_row = document.createElement('div')
-      tier_row.id = `row${key}`
-      tier_row.className = 'row'
+    var tierOriginalCount = ranking_config.rows.size
 
-      //left side labels
-      const label = document.createElement('div')
-      label.id = `label${key}`
-      label.className = 'tier-label'
-      label.textContent = key
+    function renderRows() {
+      const container = document.getElementById('row-container')
+      container.innerHTML = ''
+      for (const [key, rowData] of ranking_config.rows.entries()) {
+        const tier_row = document.createElement('div')
+        tier_row.id = `row${key}`
+        tier_row.className = 'row'
 
-      //dropzones
-      const dropzone = document.createElement('div')
-      dropzone.id = `${key}`
-      dropzone.addEventListener('drop', dropHandler)
-      dropzone.addEventListener('dragover', dragoverHandler)
-      dropzone.className = 'drop-zone'
+        const label = document.createElement('div')
+        label.id = `label${key}`
+        label.className = 'tier-label'
+        label.textContent = rowData.name
+        label.contentEditable = true
+        label.value = key
+        label.addEventListener('input', changeName)
+        label.style.backgroundColor = rowData.color
 
-      //settings
-      const settings = document.createElement('div')
-      settings.id = `settings${key}`
-      settings.className = 'tier-settings'
+        const dropzone = document.createElement('div')
+        dropzone.id = `${key}`
+        dropzone.addEventListener('drop', dropHandler)
+        dropzone.addEventListener('dragover', dragoverHandler)
+        dropzone.className = 'drop-zone'
 
-      //append all to the rows
-      tier_row.appendChild(label)
-      tier_row.appendChild(dropzone)
-      tier_row.appendChild(settings)
-      container.appendChild(tier_row)
+        const settings = document.createElement('div')
+        settings.id = `settings${key}`
+        settings.className = 'tier-settings'
+
+        tier_row.appendChild(label)
+        tier_row.appendChild(dropzone)
+        tier_row.appendChild(settings)
+        container.appendChild(tier_row)
+      }
+      // After rows are rendered, add settings buttons
+      const settings_tabs = document.getElementsByClassName('tier-settings')
+      for (const tab of settings_tabs) {
+        const tier = tab.id.replace('settings', '')
+        const palette = document.createElement('button')
+        palette.id = `palette-${tier}`
+        palette.className = 'palette'
+        palette.innerHTML =
+          '<i class="fa-slab fa-regular fa-palette fa-xl"></i>'
+        palette.addEventListener('click', changeColor)
+        const trash = document.createElement('button')
+        trash.id = `trash-${tier}`
+        trash.className = 'trash'
+        trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>'
+        trash.addEventListener('click', deleteTierFunction)
+        const upArrow = document.createElement('button')
+        upArrow.id = `up-${tier}`
+        upArrow.className = 'up-arrow'
+        upArrow.innerHTML =
+          '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>'
+        upArrow.addEventListener('click', moveRowUp)
+        const downArrow = document.createElement('button')
+        downArrow.id = `down-${tier}`
+        downArrow.className = 'down-arrow'
+        downArrow.innerHTML =
+          '<i class="fa-slab fa-regular fa-angle-down fa-xl"></i>'
+        downArrow.addEventListener('click', moveRowDown)
+        tab.appendChild(palette)
+        tab.appendChild(trash)
+        tab.appendChild(upArrow)
+        tab.appendChild(downArrow)
+      }
     }
 
-    settings_tabs = document.getElementsByClassName('tier-settings')
+    document.getElementById('add').addEventListener('click', addTier)
 
-    for (const tab of settings_tabs) {
-      const tier = tab.id.replace('settings', '') // S, A, B, ...
-
-      // gear button
-      const palette = document.createElement('button')
-      palette.id = `palette-${tier}`
-      palette.className = 'palette'
-      palette.innerHTML = '<i class="fa-slab fa-regular fa-palette fa-xl"></i>'
-      palette.addEventListener('click', changeColor)
-
-      // trash button
-      const trash = document.createElement('button')
-      trash.id = `trash-${tier}`
-      trash.className = 'trash'
-      trash.innerHTML = '<i class="fa-slab fa-regular fa-trash fa-xl"></i>'
-      trash.addEventListener('click', deleteTierFunction)
-
-      // up arrow
-      const upArrow = document.createElement('button')
-      upArrow.id = `up-${tier}`
-      upArrow.className = 'up-arrow'
-      upArrow.innerHTML = '<i class="fa-slab fa-regular fa-angle-up fa-xl"></i>'
-      upArrow.addEventListener('click', moveRowUp)
-
-      // down arrow
-      const downArrow = document.createElement('button')
-      downArrow.id = `down-${tier}`
-      downArrow.className = 'down-arrow'
-      downArrow.innerHTML =
-        '<i class="fa-slab fa-regular fa-angle-down fa-xl"></i>'
-      downArrow.addEventListener('click', moveRowDown)
-
-      tab.appendChild(palette)
-      tab.appendChild(trash)
-      tab.appendChild(upArrow)
-      tab.appendChild(downArrow)
+    function addTier(ev) {
+      const newTierKey = tierOriginalCount + 1
+      ranking_config.rows.set(newTierKey.toString(), {
+        name: `Tier ${newTierKey}`,
+        color: '#cccccc',
+        images: []
+      })
+      renderRows()
+      tierOriginalCount++
     }
 
     function changeColor(ev) {
@@ -86,6 +98,8 @@
 
       colorInput.addEventListener('input', () => {
         label.style.backgroundColor = colorInput.value
+        ranking_config.rows.get(row.id.replace('row', '')).color =
+          colorInput.value
       })
       colorInput.click()
     }
@@ -98,13 +112,12 @@
 
     function deleteTierFunction(ev) {
       const row = ev.currentTarget.closest('.row')
-
       const container = row.parentElement
       const allRows = container.querySelectorAll('.row')
 
       if (allRows.length > 1) {
-        row.remove()
-        ranking_config.get('rows').delete(row.id.replace('row', ''))
+        ranking_config.rows.delete(row.id.replace('row', ''))
+        renderRows()
       } else {
         alert('Cannot have a list with no rows.')
       }
@@ -115,9 +128,7 @@
       const prevRow = row.previousElementSibling
 
       if (prevRow) {
-        row.parentElement.insertBefore(row, prevRow)
-
-        const entries = Array.from(ranking_config.entries())
+        const entries = Array.from(ranking_config.rows.entries())
         const indexA = entries.findIndex(
           ([key]) => key === row.id.replace('row', '')
         )
@@ -128,16 +139,8 @@
         // Swap elements at indexA and indexB
         ;[entries[indexA], entries[indexB]] = [entries[indexB], entries[indexA]]
 
-        ranking_config = new Map(entries)
-        const rankingConfigEvent = new CustomEvent('rankingConfig', {
-          detail: { newMap: ranking_config }
-        })
-        document.dispatchEvent(rankingConfigEvent)
-
-        console.log(ranking_config)
-        // Add temporary highlight
-        row.classList.add('moved')
-        setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
+        ranking_config.rows = new Map(entries)
+        renderRows()
       } else {
         alert('This row is already at the top.')
       }
@@ -148,14 +151,32 @@
       const nextRow = row.nextElementSibling
 
       if (nextRow) {
-        row.parentElement.insertBefore(nextRow, row)
+        const entries = Array.from(ranking_config.rows.entries())
+        const indexA = entries.findIndex(
+          ([key]) => key === row.id.replace('row', '')
+        )
+        const indexB = entries.findIndex(
+          ([key]) => key === nextRow.id.replace('row', '')
+        )
 
-        // Add temporary highlight
-        row.classList.add('moved')
-        setTimeout(() => row.classList.remove('moved'), 500) // remove after 0.5s
+        // Swap elements at indexA and indexB
+        ;[entries[indexA], entries[indexB]] = [entries[indexB], entries[indexA]]
+
+        ranking_config.rows = new Map(entries)
+        renderRows()
       } else {
         alert('This row is already at the bottom.')
       }
     }
+
+    function changeName(ev) {
+      const row = ev.currentTarget.closest('.row')
+      const newName = ev.currentTarget.textContent.trim()
+
+      ranking_config.rows.get(row.id.replace('row', '')).name = newName
+    }
+
+    // Initial render using current ranking_config.rows
+    renderRows()
   })
 </script>
